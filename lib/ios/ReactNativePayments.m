@@ -344,7 +344,27 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
     if (token) {
         [paymentResponse setObject:token forKey:@"paymentToken"];
     }
-    
+
+    // once user approves payment, apple pay sends the full shipping address.
+    // update payment request
+    CNPostalAddress *shippingAddress = payment.shippingContact.postalAddress;
+    NSPersonNameComponentsFormatter *formatter = [[NSPersonNameComponentsFormatter alloc] init];
+    NSString *recipientName = [formatter stringFromPersonNameComponents:payment.shippingContact.name];
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"NativePayments:onshippingaddresschange"
+                                                    body:@{
+                                                           @"recipient": recipientName,
+                                                           @"addressLine": shippingAddress.street,
+                                                           @"city": shippingAddress.city,
+                                                           @"region": shippingAddress.state,
+                                                           @"country": [shippingAddress.ISOCountryCode uppercaseString],
+                                                           @"postalCode": shippingAddress.postalCode,
+                                                           @"phone": payment.shippingContact.phoneNumber.stringValue,
+                                                           @"email": payment.shippingContact.emailAddress,
+                                                           @"languageCode": [NSNull null],
+                                                           @"sortingCode": [NSNull null],
+                                                           @"dependentLocality": [NSNull null]
+                                                           }];
+
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"NativePayments:onuseraccept"
                                                     body:paymentResponse
      ];
