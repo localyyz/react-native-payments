@@ -59,8 +59,10 @@
 {
 #if __has_include(<Stripe/Stripe.h>)
     NSString *stripePublishableKey = gatewayParameters[@"stripe:publishableKey"];
+    NSString *stripeAccountId = gatewayParameters[@"stripe:accountId"];
     [[STPPaymentConfiguration sharedConfiguration] setPublishableKey:stripePublishableKey];
     [[STPPaymentConfiguration sharedConfiguration] setAppleMerchantIdentifier:merchantId];
+    [[STPPaymentConfiguration sharedConfiguration] setStripeAccount:stripeAccountId];
 #endif
 }
 
