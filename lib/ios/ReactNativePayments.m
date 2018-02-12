@@ -42,7 +42,7 @@ RCT_EXPORT_METHOD(createPaymentRequest: (NSDictionary *)methodData
     self.paymentRequest.supportedNetworks = [self getSupportedNetworksFromMethodData:methodData];
     self.paymentRequest.paymentSummaryItems = [self getPaymentSummaryItemsFromDetails:details];
     self.paymentRequest.shippingMethods = [self getShippingMethodsFromDetails:details];
-    
+    [self setRequiredBillingContactFieldsFromOptions:options];
     [self setRequiredShippingAddressFieldsFromOptions:options];
     
     // Set options so that we can later access it.
@@ -312,6 +312,14 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
     return shippingMethod;
 }
 
+- (void)setRequiredBillingContactFieldsFromOptions:(NSDictionary *_Nonnull)options
+{
+    // Request Shipping
+    if (options[@"requestBilling"]) {
+        self.paymentRequest.requiredBillingContactFields = [NSSet setWithObject:PKContactFieldPostalAddress];
+    }
+}
+
 - (void)setRequiredShippingAddressFieldsFromOptions:(NSDictionary *_Nonnull)options
 {
     // Request Shipping
@@ -364,6 +372,20 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
                                                            @"languageCode": [NSNull null],
                                                            @"sortingCode": [NSNull null],
                                                            @"dependentLocality": [NSNull null]
+                                                           }];
+
+    // once user approves payment, apple pay sends the full billing address.
+    NSString *billingRecicpientName = [formatter stringFromPersonNameComponents:payment.billingContact.name];
+    CNPostalAddress *billingAddress = payment.billingContact.postalAddress;
+    [self.bridge.eventDispatcher sendDeviceEventWithName:@"NativePayments:onbillingcontactchange"
+                                                    body:@{
+                                                           @"recipient": billingRecicpientName,
+                                                           @"addressLine": billingAddress.street,
+                                                           @"city": billingAddress.city,
+                                                           @"region": billingAddress.state,
+                                                           @"country": billingAddress.country,
+                                                           @"countryCode": [billingAddress.ISOCountryCode uppercaseString],
+                                                           @"postalCode": billingAddress.postalCode,
                                                            }];
 
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"NativePayments:onuseraccept"
