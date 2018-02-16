@@ -1,5 +1,3 @@
-#import "ReactNativePayments.h"
-#import <React/RCTUtils.h>
 #import <React/RCTEventDispatcher.h>
 
 @implementation ReactNativePayments
@@ -40,8 +38,9 @@ RCT_EXPORT_METHOD(createPaymentRequest: (NSDictionary *)methodData
     self.paymentRequest.countryCode = methodData[@"countryCode"];
     self.paymentRequest.currencyCode = methodData[@"currencyCode"];
     self.paymentRequest.supportedNetworks = [self getSupportedNetworksFromMethodData:methodData];
-    self.paymentRequest.paymentSummaryItems = [self getPaymentSummaryItemsFromDetails:details];
     self.paymentRequest.shippingMethods = [self getShippingMethodsFromDetails:details];
+    self.paymentRequest.paymentSummaryItems = [self getPaymentSummaryItemsFromDetails:details];
+
     [self setRequiredBillingContactFieldsFromOptions:options];
     [self setRequiredShippingAddressFieldsFromOptions:options];
     
@@ -100,9 +99,10 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
         
         return;
     }
-    
     NSArray<PKShippingMethod *> * shippingMethods = [self getShippingMethodsFromDetails:details];
-    
+    if (shippingMethods) {
+        self.paymentRequest.shippingMethods = shippingMethods;
+    }
     NSArray<PKPaymentSummaryItem *> * paymentSummaryItems = [self getPaymentSummaryItemsFromDetails:details];
     
     
@@ -269,7 +269,36 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
     // Add total to `paymentSummaryItems`
     NSDictionary *total = details[@"total"];
     [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:total]];
+
+    // Add subtotal to `paymentSummaryItems`
+    NSDictionary *subtotal = details[@"subtotal"];
+    if (subtotal) {
+        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:subtotal]];
+    }
+
+    // Add shipping to `paymentSummaryItems`
+    NSDictionary *shipping = details[@"shipping"];
+    if (shipping) {
+        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:shipping]];
+    } else if (self.paymentRequest.shippingMethods.count > 0) {
+        // If no shipping option is selected. use first method as default
+        PKShippingMethod *defaultShipping = self.paymentRequest.shippingMethods[0];
+        [paymentSummaryItems addObject: defaultShipping];
+    }
+
     
+    // Add tax to `paymentSummaryItems`
+    NSDictionary *tax = details[@"tax"];
+    if (tax) {
+        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:tax]];
+    }
+
+    // Add total to `paymentSummaryItems`
+    NSDictionary *total = details[@"total"];
+    if (total) {
+        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:total]];
+    }
+
     return paymentSummaryItems;
 }
 
