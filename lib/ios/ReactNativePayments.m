@@ -176,6 +176,7 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
     // street, subAdministrativeArea, and subLocality are supressed for privacy
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"NativePayments:onshippingaddresschange"
                                                     body:@{
+                                                           @"isPartial": @YES,
                                                            @"recipient": [NSNull null],
                                                            @"organization": [NSNull null],
                                                            @"addressLine": [NSNull null],
@@ -389,6 +390,7 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
     NSString *recipientName = [formatter stringFromPersonNameComponents:payment.shippingContact.name];
     [self.bridge.eventDispatcher sendDeviceEventWithName:@"NativePayments:onshippingaddresschange"
                                                     body:@{
+                                                           @"isPartial": @NO,
                                                            @"recipient": recipientName,
                                                            @"addressLine": shippingAddress.street,
                                                            @"city": shippingAddress.city,
