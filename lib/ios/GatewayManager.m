@@ -1,7 +1,7 @@
 #import "GatewayManager.h"
 
-#if __has_include(<Stripe/Stripe.h>)
-#import <Stripe/Stripe.h>
+#if __has_include(<Stripe.h>)
+#import <Stripe.h>
 #endif
 
 #if __has_include(<BraintreeApplePay/BraintreeApplePay.h>)
@@ -14,7 +14,7 @@
 {
     NSMutableArray *supportedGateways = [NSMutableArray array];
 
-#if __has_include(<Stripe/Stripe.h>)
+#if __has_include(<Stripe.h>)
     [supportedGateways addObject:@"stripe"];
 #endif
 
@@ -28,7 +28,7 @@
 - (void)configureGateway:(NSDictionary *_Nonnull)gatewayParameters
       merchantIdentifier:(NSString *_Nonnull)merchantId
 {
-#if __has_include(<Stripe/Stripe.h>)
+#if __has_include(<Stripe.h>)
     if ([gatewayParameters[@"gateway"] isEqualToString:@"stripe"]) {
         [self configureStripeGateway:gatewayParameters merchantIdentifier:merchantId];
     }
@@ -44,7 +44,7 @@
 - (void)createTokenWithPayment:(PKPayment *_Nonnull)payment
                     completion:(void (^_Nullable)(NSString * _Nullable token, NSError * _Nullable error))completion
 {
-#if __has_include(<Stripe/Stripe.h>)
+#if __has_include(<Stripe.h>)
     [self createStripeTokenWithPayment:payment completion:completion];
 #endif
 
@@ -57,7 +57,7 @@
 - (void)configureStripeGateway:(NSDictionary *_Nonnull)gatewayParameters
             merchantIdentifier:(NSString *_Nonnull)merchantId
 {
-#if __has_include(<Stripe/Stripe.h>)
+#if __has_include(<Stripe.h>)
     NSString *stripePublishableKey = gatewayParameters[@"stripe:publishableKey"];
     NSString *stripeAccountId = gatewayParameters[@"stripe:accountId"];
     [[STPPaymentConfiguration sharedConfiguration] setPublishableKey:stripePublishableKey];
@@ -68,7 +68,7 @@
 
 - (void)createStripeTokenWithPayment:(PKPayment *)payment completion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion
 {
-#if __has_include(<Stripe/Stripe.h>)
+#if __has_include(<Stripe.h>)
     [[STPAPIClient sharedClient] createTokenWithPayment:payment completion:^(STPToken * _Nullable token, NSError * _Nullable error)
     {
         if (error) {

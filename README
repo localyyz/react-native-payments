@@ -1,0 +1,10 @@
+# Troubleshoot
+
+- Stripe.h header file not found with Cocopod.
+
+Add 
+`$(SRCROOT)/../../../../ios/Pods/Stripe/Stripe`
+and
+`$(SRCROOT)/../../../../ios/Pods/Stripe/Stripe/PublicHeaders`
+
+to project header search path.
