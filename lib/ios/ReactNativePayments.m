@@ -1,3 +1,5 @@
+#import "ReactNativePayments.h"
+#import <React/RCTUtils.h>
 #import <React/RCTEventDispatcher.h>
 
 @implementation ReactNativePayments
@@ -270,7 +272,9 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
     
     // Add total to `paymentSummaryItems`
     NSDictionary *total = details[@"total"];
-    [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:total]];
+    if (total) {
+        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:total]];
+    }
 
     // Add subtotal to `paymentSummaryItems`
     NSDictionary *subtotal = details[@"subtotal"];
@@ -293,12 +297,6 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
     NSDictionary *tax = details[@"tax"];
     if (tax) {
         [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:tax]];
-    }
-
-    // Add total to `paymentSummaryItems`
-    NSDictionary *total = details[@"total"];
-    if (total) {
-        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:total]];
     }
 
     return paymentSummaryItems;
