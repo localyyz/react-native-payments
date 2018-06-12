@@ -269,17 +269,17 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
             [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:displayItem]];
         }
     }
-    
-    // Add total to `paymentSummaryItems`
-    NSDictionary *total = details[@"total"];
-    if (total) {
-        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:total]];
-    }
 
     // Add subtotal to `paymentSummaryItems`
     NSDictionary *subtotal = details[@"subtotal"];
     if (subtotal) {
         [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:subtotal]];
+    }
+    
+    // Add tax to `paymentSummaryItems`
+    NSDictionary *tax = details[@"tax"];
+    if (tax) {
+        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:tax]];
     }
 
     // Add shipping to `paymentSummaryItems`
@@ -291,12 +291,11 @@ RCT_EXPORT_METHOD(handleDetailsUpdate: (NSDictionary *)details
         PKShippingMethod *defaultShipping = self.paymentRequest.shippingMethods[0];
         [paymentSummaryItems addObject: defaultShipping];
     }
-
     
-    // Add tax to `paymentSummaryItems`
-    NSDictionary *tax = details[@"tax"];
-    if (tax) {
-        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:tax]];
+    // Add total to `paymentSummaryItems`
+    NSDictionary *total = details[@"total"];
+    if (total) {
+        [paymentSummaryItems addObject: [self convertDisplayItemToPaymentSummaryItem:total]];
     }
 
     return paymentSummaryItems;
